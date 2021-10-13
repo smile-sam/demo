@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!--所有的业务日志-->
+    <appender name="info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${log.info}/info.log</File>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>${log.info}/zip/info.%d{yyyy-MM-dd-HH}.%i.zip</FileNamePattern>
+            <TimeBasedFileNamingAndTriggeringPolicy
+                    class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>50MB</MaxFileSize>
+            </TimeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">  <!-- 修改class为TraceIdPatternLogbackLayout -->
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level [%F:%L] %tid - %msg%n</Pattern>  <!-- %tid即是skywalking的跟踪id -->
+            </layout>
+            <charset class="java.nio.charset.Charset">UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!--错误日志-->
+    <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <File>${log.error}/error.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>
+                ${log.error}/zip/error.%d{yyyy-MM-dd}.%i.zip
+            </FileNamePattern>
+            <TimeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <MaxFileSize>30MB</MaxFileSize>
+            </TimeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">
+                <Pattern>%date{yyyy-MM-dd HH:mm:ss:SSS} [%t] %-5level [%logger{0} ] %tid - %msg%n</Pattern>
+            </layout>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 控制台 -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+<!--            <layout class="org.apache.skywalking.apm.toolkit.log.logback.v1.x.TraceIdPatternLogbackLayout">-->
+<!--                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level [%F:%L] %tid - %msg%n</Pattern>-->
+<!--            </layout>-->
+
+
+            <layout class="com.example.demo.logext.MyTraceIdPatternLogbackLayout">
+                <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level [%F:%L] %mytid %tid - %msg%n</Pattern>
+            </layout>
+        </encoder>
+    </appender>
+
+
+    <root level="INFO">
+        <appender-ref ref="info" />
+        <appender-ref ref="error"/>
+        <!--非本地一定要注释掉-->
+        <appender-ref ref="stdout" />
+    </root>
+</configuration>
